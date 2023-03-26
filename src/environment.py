@@ -1,6 +1,7 @@
 import os
 import simplejson
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Point_Object:
@@ -67,6 +68,11 @@ class Point_Object:
         dir = self.position - position
         dir = dir / np.sqrt(np.dot(dir, dir))
         return self.multiplier * g * dir
+
+
+    def render(self, figure, ax):
+        ax.scatter(self.position, color="black",  s=5)
+        ax.scatter(self.position, color="orange", s=20, alpha=0.1)
 
 
 class Line_Obstacle:
@@ -173,6 +179,13 @@ class Line_Obstacle:
             return np.array([g, 0.0])
 
 
+    def render(self, figure, ax):
+        '''draw the obstacle on figure'''
+
+        ax.plot([self.start[0], self.end[0]], [self.start[1], self.end[1]], color="black",  linewidth=2)
+        ax.plot([self.start[0], self.end[0]], [self.start[1], self.end[1]], color="orange", linewidth=20, alpha=0.1)
+
+
 class Map:
     def __init__(self, map_json):
         '''load start and goal location as well as a list of obstacles'''
@@ -183,6 +196,7 @@ class Map:
         with open(map_json, 'r') as f:
             map_dict = simplejson.load(f)
 
+        self.grid_size = map_dict["grid_size"]
         self.start = np.array([map_dict["start"]["x"], map_dict["start"]["y"]])
         self.goal  = np.array([map_dict[ "goal"]["x"], map_dict[ "goal"]["y"]])
 
@@ -190,6 +204,16 @@ class Map:
             self.obstacles.append(Line_Obstacle(obstacles))
 
         print("[IFNO]: Map initialized.")
+
+
+    def is_in_bound(self, position):
+        '''check whether position is still in the map area'''
+
+        if position[0] < 0 or position[0] > self.grid_size:
+            return False
+        if position[1] < 0 or position[1] > self.grid_size:
+            return False
+        return True
 
 
     def is_in_collision(self, position):
@@ -243,3 +267,16 @@ class Map:
         force  = self.compute_goal_force(position)
         force += self.compute_obstacles_force(position)
         return force
+
+
+    def render(self):
+        '''draw the map'''
+
+        figure, ax = plt.subplots(figsize=(self.grid_size, self.grid_size))
+        ax.scatter(0.5, 0.5, s=5, color="green", marker="o")
+        ax.scatter(self.grid_size - 0.5, self.grid_size - 0.5, s=5, color="red", marker="o")
+
+        for obstacle in self.obstacles:
+            obstacle.render(figure, ax)
+
+        return figure, ax
