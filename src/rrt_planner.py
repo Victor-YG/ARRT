@@ -16,8 +16,7 @@ class RRT_Planner():
         self.sample_range = sample_range
         self.nodes = []
         self.path  = []
-        self.min_node_distance = 1.0
-
+        self.min_node_distance = 0.5
         self.figure, self.ax = self.env.render()
 
 
@@ -33,19 +32,18 @@ class RRT_Planner():
         # add start position
         self.nodes.append(self.root_node)
 
-        for _ in range(max_iter):
+        for iter in range(max_iter):
             # select a node from list of nodes
             selected_node = random.choice(self.nodes)
 
             # sample new node around selected node
-            x = np.random.uniform(
-                max(                 0, selected_node.position[0] - self.sample_range),
-                min(self.env.grid_size, selected_node.position[0] + self.sample_range))
-            y = np.random.uniform(
-                max(                 0, selected_node.position[1] - self.sample_range),
-                min(self.env.grid_size, selected_node.position[1] + self.sample_range))
-            position = np.array([x, y])
+            s     = np.random.uniform(self.min_node_distance, 2.0 * self.min_node_distance)
+            theta = np.random.uniform(-np.pi, np.pi)
+            step  = s * np.array([np.cos(theta), np.sin(theta)])
+            position = selected_node.position + step
 
+            if self.env.is_in_bound(position) == False:
+                continue
             if self.env.is_in_collision(position):
                 continue
 
@@ -59,7 +57,10 @@ class RRT_Planner():
                         min_dist2 = dist2
                         parent = node
 
-            if parent == None: continue
+            if parent == None:
+                continue
+            if min_dist2 < self.min_node_distance:
+                continue
 
             # configure parent and child relationship
             sampled_node = Tree_Node(position, parent)
@@ -73,7 +74,7 @@ class RRT_Planner():
                 self.goal_node = Tree_Node(goal_position, sampled_node)
                 sampled_node.add_child_node(self.goal_node)
                 self.nodes.append(self.goal_node)
-                print("[INFO]: Found a path after creating {} nodes.".format(len(self.nodes)))
+                print("[INFO]: Found a path after {} iterations with {} nodes.".format(iter, len(self.nodes)))
                 return True
 
         return False
@@ -112,7 +113,7 @@ def main():
 
     map = Map(args.input)
     planner = RRT_Planner(map)
-    path_found = planner.path_finding(map.start, map.goal, max_iter=1000)
+    path_found = planner.path_finding(map.start, map.goal, max_iter=10000)
     if path_found:
         path, cost = planner.get_final_path()
         print("[INFO]: Found a path with {} nodes and total cost = {}.".format(len(path), cost))
