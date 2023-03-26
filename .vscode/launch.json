@@ -5,12 +5,32 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
             "name": "generate map",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/map_generator.py",
             "console": "integratedTerminal",
             "args": [],
+            "justMyCode": true
+        },
+        {
+            "name": "RRT planner",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/rrt_planner.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--input", ".\\maps\\5x5\\20230310_183717_0.json"
+                // "--input", ".\\maps\\9x9\\20230310_184435_0.json"
+            ],
             "justMyCode": true
         }
     ]

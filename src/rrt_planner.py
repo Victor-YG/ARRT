@@ -4,19 +4,19 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
-from common import Tree_Node
+from common import *
 from environment import Map
 
 
 class RRT_Planner():
     '''Implementation of the RRT algorithm'''
 
-    def __init__(self, map, sample_range=1.0):
+    def __init__(self, map, sample_range=1.0, min_node_distance=0.5):
         self.env = map
         self.sample_range = sample_range
+        self.min_node_distance = min_node_distance
         self.nodes = []
         self.path  = []
-        self.min_node_distance = 0.5
         self.figure, self.ax = self.env.render()
 
 
@@ -48,18 +48,18 @@ class RRT_Planner():
                 continue
 
             # find closest reachable neighbor
-            parent    = None
-            min_dist2 = 1000
+            parent   = None
+            min_dist = 1000
             for node in self.nodes:
-                dist2 = np.dot(node.position - position, node.position - position)
-                if dist2 < min_dist2:
+                dist2 = np.sqrt(np.dot(node.position - position, node.position - position))
+                if dist2 < min_dist:
                     if self.env.is_reachable(node.position, position):
-                        min_dist2 = dist2
+                        min_dist = dist2
                         parent = node
 
             if parent == None:
                 continue
-            if min_dist2 < self.min_node_distance:
+            if min_dist < self.min_node_distance:
                 continue
 
             # configure parent and child relationship

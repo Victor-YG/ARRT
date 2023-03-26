@@ -3,6 +3,8 @@ import simplejson
 import numpy as np
 import matplotlib.pyplot as plt
 
+from common import *
+
 
 class Point_Object:
     def __init__(self, position, is_sink, collision_radius, field_radius):
@@ -208,7 +210,7 @@ class Map:
         for obstacles in map_dict["line_obstacles"]:
             self.obstacles.append(Line_Obstacle(obstacles))
 
-        print("[IFNO]: Map initialized.")
+        print("[INFO]: Map initialized.")
 
 
     def is_in_bound(self, position):
