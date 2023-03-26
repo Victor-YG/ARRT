@@ -129,13 +129,18 @@ class Line_Obstacle:
                 return 0
 
         def onSegment(p, q, r):
-            if ( (q[0] <= max(p[0], r[0])) and (q[0] >= min(p[0], r[0])) and
+            if ((q[0] <= max(p[0], r[0])) and (q[0] >= min(p[0], r[0])) and
                 (q[1] <= max(p[1], r[1])) and (q[1] >= min(p[1], r[1]))):
                 return True
             return False
 
-        p1 = self.start
-        q1 = self.end
+        if self.is_horizontal:
+            extra = np.array([self.collision_radius, 0])
+        else:
+            extra = np.array([0, self.collision_radius])
+
+        p1 = self.start - extra
+        q1 = self.end   + extra
         p2 = position_1
         q2 = position_2
 
@@ -183,7 +188,7 @@ class Line_Obstacle:
         '''draw the obstacle on figure'''
 
         ax.plot([self.start[0], self.end[0]], [self.start[1], self.end[1]], color="black",  linewidth=2)
-        ax.plot([self.start[0], self.end[0]], [self.start[1], self.end[1]], color="orange", linewidth=20, alpha=0.1)
+        ax.plot([self.start[0], self.end[0]], [self.start[1], self.end[1]], color="orange", linewidth=10, alpha=0.1)
 
 
 class Map:
