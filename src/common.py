@@ -2,21 +2,35 @@ import random
 import numpy as np
 
 
+def distance(position_1, position_2):
+    return np.sqrt(np.dot(position_1 - position_2, position_1 - position_2))
+
+
 class Tree_Node:
-    def __init__(self, position, parent_node):
+    def __init__(self, position, parent_node, velocity=None, distance_to_goal=None):
         self.position = position
-        self.children = set()
+        self.children = []
 
         self.parent_node = parent_node
-        self.cost = 0
+        self.velocity = velocity
+        self.distance_to_goal = distance_to_goal
 
+        self.cost = 0
         if parent_node is not None:
             v = parent_node.position - position
-            self.cost = parent_node.cost + np.sqrt(np.dot(v, v))
+            self.cost = parent_node.cost + distance(parent_node.position, position)
+
+
+    def set_velocity(self, velocity):
+        self.velocity = velocity
+
+
+    def score(self):
+        return self.velocity / self.distance_to_goal
 
 
     def add_child_node(self, node):
-        self.children.add(node)
+        self.children.append(node)
 
 
 class Node_Collection:
@@ -76,7 +90,7 @@ class Node_Collection:
             return closest_node, local_min_dist
 
         for node in self.node_map[key]:
-            dist = np.sqrt(np.dot(node.position - position, node.position - position))
+            dist = distance(node.position, position)
             if dist < local_min_dist:
                 if env.is_reachable(node.position, position):
                     local_min_dist = dist
@@ -110,7 +124,7 @@ class Node_Collection:
         neighbors = []
 
         for node in self.node_map[key]:
-            dist = np.sqrt(np.dot(node.position - position, node.position - position))
+            dist = distance(node.position, position)
             if dist < dist_thres:
                 if env.is_reachable(node.position, position):
                     neighbors.append(node)
@@ -131,3 +145,77 @@ class Node_Collection:
             neigbhors.extend(self.find_neighbors_in_region(env, position, key, dist_thres))
 
         return neigbhors
+
+
+class Node_Heap:
+    '''data structure to keep track of a priority queue of nodes'''
+
+    def __init__(self, branch_factor_thres=5):
+        self.nodes = []
+        self.branch_factor_thres = branch_factor_thres # limit on how many times each node can be expanded
+
+
+    def add_node(self, node):
+        '''add a new node and heapify'''
+
+        self.nodes.append(node)
+        i = len(self.nodes) - 1
+        p = (i - 1) // 2
+
+        while p >= 0:
+            if self.nodes[i].score() < self.nodes[p].score():
+                break
+
+            # swap node
+            self.swap(i, p)
+            i = p
+            p = (i - 1) // 2
+
+
+    def get_node(self):
+        '''get the best node to expand on'''
+
+        selected_node = self.nodes[0]
+
+        if len(selected_node.children) >= self.branch_factor_thres:
+            self.pop()
+
+        return selected_node
+
+
+    def swap(self, i, j):
+        tmp_node = self.nodes[j]
+        self.nodes[j] = self.nodes[i]
+        self.nodes[i] = tmp_node
+
+
+    def heapify(self, i):
+        if i > len(self.nodes) or len(self.nodes) == 0:
+            return
+
+        c1 = i * 2 + 1
+        c2 = i * 2 + 2
+
+        v = self.nodes[i].score()
+        if c1 < len(self.nodes):
+            v1 = self.nodes[c1].score()
+        else:
+            v1 = 0
+        if c2 < len(self.nodes):
+            v2 = self.nodes[c2].score()
+        else:
+            v2 = 0
+
+        if v1 > v2 and v1 > v:
+            self.swap(i, c1)
+            self.heapify(c1)
+
+        if v1 < v2 and v2 < v:
+            self.swap(i, c2)
+            self.heapify(c2)
+
+
+    def pop(self):
+        self.nodes[0] = self.nodes[len(self.nodes) - 1]
+        self.nodes = self.nodes[:-1]
+        self.heapify(0)

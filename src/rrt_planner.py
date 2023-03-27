@@ -1,11 +1,13 @@
 import os
-import random
+import time
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
 from common import *
 from environment import Map
+
+np.random.seed(0)
 
 
 class RRT_Planner():
@@ -100,13 +102,17 @@ def main():
 
     map = Map(args.input)
     planner = RRT_Planner(map)
+
+    start_time = time.time()
     path_found = planner.path_finding(map.start, map.goal, max_iter=10000)
+    total_time = time.time() - start_time
+
     if path_found:
         path, cost = planner.get_final_path()
-        print("[INFO]: Found a path with {} nodes and total cost = {}.".format(len(path), cost))
+        print("[INFO]: Found a path with {} nodes and total cost = {} in {} secs.".format(len(path), cost, total_time))
         # for position in path: print(position)
     else:
-        print("[INFO]: Failed to find a path!")
+        print("[INFO]: Failed to find a path in {} secs.".format(total_time))
 
     # plot final path
     plt.show()

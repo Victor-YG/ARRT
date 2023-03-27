@@ -28,7 +28,7 @@ class Point_Object:
     def is_in_collision(self, position):
         '''check if position is in collision with this instance'''
 
-        if self.collision_radius == 0:
+        if self.collision_radius == 0.0:
             return False
 
         if self.distance(position) < self.collision_radius:
@@ -73,8 +73,8 @@ class Point_Object:
 
 
     def render(self, figure, ax):
-        ax.scatter(self.position, color="black",  s=5)
-        ax.scatter(self.position, color="orange", s=20, alpha=0.1)
+        ax.scatter(self.position[0], self.position[1], color="black",  s=5)
+        ax.scatter(self.position[0], self.position[1], color="orange", s=1000, alpha=0.1)
 
 
 class Line_Obstacle:

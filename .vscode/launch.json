@@ -32,6 +32,18 @@
                 // "--input", ".\\maps\\9x9\\20230310_184435_0.json"
             ],
             "justMyCode": true
+        },
+        {
+            "name": "ARRT planner",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/arrt_planner.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--input", ".\\maps\\5x5\\20230310_183717_0.json"
+                // "--input", ".\\maps\\9x9\\20230310_184435_0.json"
+            ],
+            "justMyCode": true
         }
     ]
 }
