@@ -11,9 +11,8 @@ from environment import Map
 class RRT_Planner():
     '''Implementation of the RRT algorithm'''
 
-    def __init__(self, map, sample_range=1.0, min_node_distance=0.5):
+    def __init__(self, map, min_node_distance=0.5):
         self.env = map
-        self.sample_range = sample_range
         self.min_node_distance = min_node_distance
         self.nodes = []
         self.path  = []
