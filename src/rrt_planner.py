@@ -22,9 +22,6 @@ class RRT_Planner():
     def path_finding(self, start_position, goal_position, max_iter=1000):
         '''find path from start position to goal position'''
 
-        path = []
-        cost = 0
-
         self.root_node = Tree_Node(start_position, parent_node=None)
         self.goal_node = None
 
