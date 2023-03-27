@@ -14,7 +14,7 @@ class RRT_Planner():
     def __init__(self, map, min_node_distance=0.5):
         self.env = map
         self.min_node_distance = min_node_distance
-        self.nodes = []
+        self.nodes = Node_Collection()
         self.path  = []
         self.figure, self.ax = self.env.render()
 
@@ -29,11 +29,11 @@ class RRT_Planner():
         self.goal_node = None
 
         # add start position
-        self.nodes.append(self.root_node)
+        self.nodes.add_node(self.root_node)
 
         for iter in range(max_iter):
             # select a node from list of nodes
-            selected_node = random.choice(self.nodes)
+            selected_node = self.nodes.choose()
 
             # sample new node around selected node
             s     = np.random.uniform(self.min_node_distance, 2.0 * self.min_node_distance)
@@ -47,33 +47,24 @@ class RRT_Planner():
                 continue
 
             # find closest reachable neighbor
-            parent   = None
-            min_dist = 1000
-            for node in self.nodes:
-                dist2 = np.sqrt(np.dot(node.position - position, node.position - position))
-                if dist2 < min_dist:
-                    if self.env.is_reachable(node.position, position):
-                        min_dist = dist2
-                        parent = node
+            parent, dist = self.nodes.find_cloest_node(self.env, position)
 
             if parent == None:
                 continue
-            if min_dist < self.min_node_distance:
+            if dist < self.min_node_distance:
                 continue
 
             # configure parent and child relationship
             sampled_node = Tree_Node(position, parent)
-            parent.add_child_node(sampled_node)
-            self.nodes.append(sampled_node)
+            self.nodes.add_node(sampled_node)
             self.ax.plot([parent.position[0], sampled_node.position[0]], [parent.position[1], sampled_node.position[1]], color="cyan",  linewidth=1)
             self.ax.scatter(sampled_node.position[0], sampled_node.position[1], s=3, color="blue")
 
             # check termination condition
             if self.env.is_reachable(sampled_node.position, goal_position):
                 self.goal_node = Tree_Node(goal_position, sampled_node)
-                sampled_node.add_child_node(self.goal_node)
-                self.nodes.append(self.goal_node)
-                print("[INFO]: Found a path after {} iterations with {} nodes.".format(iter, len(self.nodes)))
+                self.nodes.add_node(self.goal_node)
+                print("[INFO]: Found a path after {} iterations with {} nodes.".format(iter, self.nodes.size()))
                 return True
 
         return False
