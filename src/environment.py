@@ -245,10 +245,10 @@ class Map:
 
 
     def compute_goal_force(self, position):
-        '''return unit vector from given position to goal position'''
+        '''return force vector from given position to goal position'''
 
         dir = np.subtract(self.goal, position)
-        return np.divide(dir, np.sqrt(np.dot(dir, dir)))
+        return GOAL_FORCE_AMPLITUDE * np.divide(dir, np.sqrt(np.dot(dir, dir)))
 
 
     def compute_obstacles_force(self, position):

@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from common import *
 from environment import Map
 
+random.seed(0)
 np.random.seed(0)
 
 

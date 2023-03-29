@@ -2,8 +2,16 @@ import random
 import numpy as np
 
 
+GOAL_FORCE_AMPLITUDE = 1.5
+INITIAL_SPEED = 0.5
+
+
 def distance(position_1, position_2):
     return np.sqrt(np.dot(position_1 - position_2, position_1 - position_2))
+
+
+def cross_product_2d(position_1, position_2):
+    return position_1[0] * position_2[1] - position_1[1] * position_2[0]
 
 
 class Tree_Node:
@@ -12,7 +20,7 @@ class Tree_Node:
         self.children = []
 
         self.parent_node = parent_node
-        self.velocity = velocity
+        self.velocity = velocity # [speed, angle, angle_search_range]
         self.distance_to_goal = distance_to_goal
 
         self.cost = 0
@@ -26,7 +34,7 @@ class Tree_Node:
 
 
     def score(self):
-        return self.velocity / self.distance_to_goal
+        return self.velocity[0] / self.distance_to_goal
 
 
     def add_child_node(self, node):
@@ -174,6 +182,10 @@ class Node_Heap:
 
     def get_node(self):
         '''get the best node to expand on'''
+
+        if len(self.nodes) == 0:
+            print("[INFO]: No node left!")
+            return None
 
         selected_node = self.nodes[0]
 
