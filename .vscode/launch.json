@@ -44,6 +44,18 @@
                 // "--input", ".\\maps\\9x9\\20230310_184435_0.json"
             ],
             "justMyCode": true
+        },
+        {
+            "name": "evaluation",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/evaluation.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--input", ".\\maps\\eval",
+                "--output", ".\\maps\\eval"
+            ],
+            "justMyCode": true
         }
     ]
 }
