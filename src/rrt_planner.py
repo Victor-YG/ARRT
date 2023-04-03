@@ -20,7 +20,7 @@ class RRT_Planner():
         self.nodes = Node_Collection()
         self.path  = []
         self.figure, self.ax = self.env.render()
-
+        self.final_iteration = None
 
     def path_finding(self, start_position, goal_position, max_iter=1000):
         '''find path from start position to goal position'''
@@ -64,6 +64,7 @@ class RRT_Planner():
             if self.env.is_reachable(sampled_node.position, goal_position):
                 self.goal_node = Tree_Node(goal_position, sampled_node)
                 self.nodes.add_node(self.goal_node)
+                self.final_iteration = iter
                 print("[INFO]: Found a path after {} iterations with {} nodes.".format(iter, self.nodes.size()))
                 return True
 
@@ -87,10 +88,10 @@ class RRT_Planner():
         return self.path, self.goal_node.cost
 
 
-    def dump_statistics(self, filename):
-        '''save number of nodes, path length, cost etc. to file'''
-        #TODO::to be implemented
-        pass
+    def dump_statistics(self):
+        '''output iteration count, number of nodes explored'''
+
+        return self.final_iteration, self.nodes.size()
 
 
 def main():

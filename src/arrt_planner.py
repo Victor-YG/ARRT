@@ -21,6 +21,7 @@ class ARRT_Planner(RRT_Planner):
         self.node_heap = Node_Heap()
         self.initial_speed = INITIAL_SPEED
         self.initial_angle = np.pi / 4
+        self.final_iteration = None
 
 
     def damp_node_speed(self, node):
@@ -99,6 +100,7 @@ class ARRT_Planner(RRT_Planner):
             if self.env.is_reachable(sampled_node.position, goal_position):
                 self.goal_node = Tree_Node(goal_position, sampled_node, 0, 0)
                 self.nodes.add_node(self.goal_node)
+                self.final_iteration = iter
                 print("[INFO]: Found a path after {} iterations with {} nodes.".format(iter, self.nodes.size()))
                 return True
 
