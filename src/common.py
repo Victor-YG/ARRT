@@ -171,7 +171,7 @@ class Node_Heap:
         p = (i - 1) // 2
 
         while p >= 0:
-            if self.nodes[i].score() < self.nodes[p].score():
+            if self.nodes[i].score() <= self.nodes[p].score():
                 break
 
             # swap node
@@ -222,7 +222,7 @@ class Node_Heap:
             self.swap(i, c1)
             self.heapify(c1)
 
-        if v1 < v2 and v2 < v:
+        if v2 > v1 and v2 > v:
             self.swap(i, c2)
             self.heapify(c2)
 
