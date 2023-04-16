@@ -54,11 +54,11 @@ class ARRT_Planner(RRT_Planner):
                 return False
 
             # sample new node around selected node
-            s     = np.random.uniform(self.min_node_distance, 2.0 * self.min_node_distance)
+            # s     = np.random.uniform(self.min_node_distance, 2.0 * self.min_node_distance)
             theta = np.random.uniform(-np.pi, np.pi)
-            # s     = np.random.uniform(
-            #     selected_node.velocity[0] * 1.0,
-            #     selected_node.velocity[0] * 2.0)
+            s     = np.random.uniform(
+                max(self.min_node_distance,       selected_node.velocity[0] * 1.0),
+                max(self.min_node_distance * 2.0, selected_node.velocity[0] * 2.0))
             # theta = np.random.uniform(
             #     selected_node.velocity[1] - selected_node.velocity[2],
             #     selected_node.velocity[1] + selected_node.velocity[2])
@@ -82,10 +82,9 @@ class ARRT_Planner(RRT_Planner):
             # compute velocity
             force = self.env.compute_goal_force(position)
 
-            # speed = parent.velocity[0] * max(1.0, min(1.5, np.power(np.dot(step, step), np.dot(force, step))))
-            # velocity = [speed, theta, np.pi]
-
-            speed = self.initial_speed
+            # latest implementation
+            scale = np.power(1.1, np.dot(force, step))
+            speed = parent.velocity[0] * max(1.0, scale)
             angle_range = min(np.pi, max(np.pi / 4, parent.velocity[2] * self.initial_speed / speed))
             velocity = [speed, theta, angle_range]
 
