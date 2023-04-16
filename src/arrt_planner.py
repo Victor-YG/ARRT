@@ -25,13 +25,14 @@ class ARRT_Planner(RRT_Planner):
 
 
     def damp_node_speed(self, node):
-        node.velocity[0] *= 0.8
+        node.velocity[0] *= 0.9
         if node.velocity[0] < 0.01:
             point_obstacle = Point_Object(node.position, False, collision_radius=0.0, field_radius=0.5)
             point_obstacle.render(self.figure, self.ax)
             self.env.obstacles.append(point_obstacle)
             self.node_heap.pop()
-        # self.node_heap.heapify(0)
+        if node.velocity[0] < 0.3:
+            self.node_heap.heapify(0)
 
 
     def path_finding(self, start_position, goal_position, max_iter=1000):
@@ -54,13 +55,13 @@ class ARRT_Planner(RRT_Planner):
 
             # sample new node around selected node
             s     = np.random.uniform(self.min_node_distance, 2.0 * self.min_node_distance)
-            # theta = np.random.uniform(-np.pi, np.pi)
+            theta = np.random.uniform(-np.pi, np.pi)
             # s     = np.random.uniform(
             #     selected_node.velocity[0] * 1.0,
             #     selected_node.velocity[0] * 2.0)
-            theta = np.random.uniform(
-                selected_node.velocity[1] - selected_node.velocity[2],
-                selected_node.velocity[1] + selected_node.velocity[2])
+            # theta = np.random.uniform(
+            #     selected_node.velocity[1] - selected_node.velocity[2],
+            #     selected_node.velocity[1] + selected_node.velocity[2])
             step  = s * np.array([np.cos(theta), np.sin(theta)])
             position = selected_node.position + step
 
@@ -80,14 +81,13 @@ class ARRT_Planner(RRT_Planner):
 
             # compute velocity
             force = self.env.compute_goal_force(position)
-            cross_product = cross_product_2d(force, step)
-            speed = max(parent.velocity[0], parent.velocity[0] * abs(cross_product))
+
+            # speed = parent.velocity[0] * max(1.0, min(1.5, np.power(np.dot(step, step), np.dot(force, step))))
+            # velocity = [speed, theta, np.pi]
+
+            speed = self.initial_speed
             angle_range = min(np.pi, max(np.pi / 4, parent.velocity[2] * self.initial_speed / speed))
             velocity = [speed, theta, angle_range]
-            if angle_range < np.pi:
-                print("range")
-            if angle_range < np.pi / 4:
-                print("range = {}".format(angle_range))
 
             # configure parent and child relationship
             sampled_node = Tree_Node(position, parent, velocity, distance(position, goal_position))
