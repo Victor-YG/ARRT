@@ -1,6 +1,7 @@
 import os
 import argparse
 import simplejson
+import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -54,6 +55,20 @@ def main():
                 nodes[algo_name].append(repeat["nodes"])
                 length[algo_name].append(repeat["path_length"])
                 cost[algo_name].append(repeat["path_cost"])
+
+                avg_exec_time = np.average(np.array(exec_time[algo_name]))
+                avg_iterations = np.average(np.array(iterations[algo_name]))
+                avg_nodes = np.average(np.array(nodes[algo_name]))
+                avg_length = np.average(np.array(length[algo_name]))
+                avg_cost = np.average(np.array(cost[algo_name]))
+
+        # print summary
+        print("Result for {} in {}:".format(algo_name, args.tag))
+        print("Avg execution time for {0} = {1}".format(algo_name, avg_exec_time))
+        print("Avg iteations for {} = {}".format(algo_name, avg_iterations))
+        print("Avg nodes for {} = {}".format(algo_name, avg_nodes))
+        print("Avg length for {} = {}".format(algo_name, avg_length))
+        print("Avg cost for {} = {}".format(algo_name, avg_cost))
 
     # plot results
     plt.boxplot([exec_time[algo] for algo in exec_time], labels=args.algo)
