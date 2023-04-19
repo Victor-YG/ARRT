@@ -148,7 +148,7 @@ def main():
     planner = RRTS_Planner(map)
 
     start_time = time.time()
-    path_found = planner.path_finding(map.start, map.goal, 1000)
+    path_found = planner.path_finding(map.start, map.goal, 10000)
     total_time = time.time() - start_time
 
     if path_found:
