@@ -93,12 +93,12 @@ def main():
 
         map_key = os.path.basename(map_json).replace(".json", "")
         results[ "rrt"][map_key] = map_result_rrt
-        results["arrts"][map_key] = map_result_arrt
+        results["arrt"][map_key] = map_result_arrt
 
     # save results
     with open(os.path.join(args.output, "summary_rrt.json"), "w") as f:
         print(simplejson.dumps(results[ "rrt"], ensure_ascii=False, indent=4), file=f)
-    with open(os.path.join(args.output, "summary_arrts.json"), "w") as f:
+    with open(os.path.join(args.output, "summary_arrt.json"), "w") as f:
         print(simplejson.dumps(results["arrt"], ensure_ascii=False, indent=4), file=f)
 
 
