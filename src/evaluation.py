@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 
 from environment import Map
 from rrt_planner import RRT_Planner
-from rrts_planner import RRTS_Planner
 from arrt_planner import ARRT_Planner
 
 
@@ -94,12 +93,12 @@ def main():
 
         map_key = os.path.basename(map_json).replace(".json", "")
         results[ "rrt"][map_key] = map_result_rrt
-        results["arrt"][map_key] = map_result_arrt
+        results["arrts"][map_key] = map_result_arrt
 
     # save results
     with open(os.path.join(args.output, "summary_rrt.json"), "w") as f:
         print(simplejson.dumps(results[ "rrt"], ensure_ascii=False, indent=4), file=f)
-    with open(os.path.join(args.output, "summary_arrt.json"), "w") as f:
+    with open(os.path.join(args.output, "summary_arrts.json"), "w") as f:
         print(simplejson.dumps(results["arrt"], ensure_ascii=False, indent=4), file=f)
 
 

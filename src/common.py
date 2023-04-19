@@ -67,7 +67,6 @@ class Node_Collection:
             self.node_map[key] = []
         self.node_map[key].append(node)
 
-
     def get_search_keys(self, query_key):
         '''get all keys to regions to be searched'''
 
@@ -87,6 +86,67 @@ class Node_Collection:
         ]
 
         return keys
+
+    def get_search_keys_2(self, query_key, dist):
+        '''get all keys to regions to be searched'''
+
+        key_x = query_key[0]
+        key_y = query_key[1]
+
+        keys = [(key_x + 0, key_y + 0)]
+
+        for i in range(int(np.floor(dist))):
+            j = i+1
+            keys.append((key_x - j, key_y + 0))
+            keys.append((key_x + j, key_y + 0))
+            keys.append((key_x + 0, key_y + j))
+            keys.append((key_x + 0, key_y - j))
+            keys.append((key_x - j, key_y + j))
+            keys.append((key_x - j, key_y - j))
+            keys.append((key_x + j, key_y + j))
+            keys.append((key_x + j, key_y - j))
+
+        return keys
+
+    def find_best_in_region(self, env, position, key, dist_thres, root_node):
+        best_node = None
+        local_dist = float('inf')
+        local_min_cost = float('inf')
+        min_dist = float('inf')
+
+        if key not in self.node_map:
+            return best_node, local_dist, min_dist
+
+        keys = self.get_search_keys_2(key, dist_thres)
+
+        for k in keys:
+            if k not in self.node_map:
+                continue
+            for node in self.node_map[k]:
+                dist = distance(node.position, position)
+                cost = node.cost + dist
+                if dist < dist_thres:
+                    if cost < local_min_cost:
+                        if env.is_reachable(node.position, position):
+                            local_min_cost = cost
+                            best_node = node
+                            local_dist = dist
+                if dist < min_dist:
+                    min_dist = dist
+
+        node = root_node
+        dist = distance(node.position, position)
+        cost = node.cost + dist
+        if dist < dist_thres:
+            if cost < local_min_cost:
+                if env.is_reachable(node.position, position):
+                    local_min_cost = cost
+                    best_node = node
+                    local_dist = dist
+        if dist < min_dist:
+            min_dist = dist
+
+        return best_node, local_dist, min_dist
 
     def find_closest_in_region(self, env, position, key, min_dist):
         '''find closest reacheable node in a region given its key'''
